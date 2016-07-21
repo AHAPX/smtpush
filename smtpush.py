@@ -20,12 +20,11 @@ logger.addHandler(logging.StreamHandler())
 
 def sendmail(to, subj, body, html=False, sender=None, cc=None, bcc=None, config={}):
     sendto = to
-    msgid = make_msgid()
     msg = MIMEText(body, 'html' if html else 'text')
     msg['To'] = ','.join(to)
     msg['From'] = sender or config.get('from', '')
     msg['Subject'] = subj
-    msg['Message-ID'] = msgid
+    msg['Message-ID'] = make_msgid()
     msg['Date'] = formatdate()
     if cc is not None:
         msg['cc'] = ','.join(cc)
@@ -41,7 +40,7 @@ def sendmail(to, subj, body, html=False, sender=None, cc=None, bcc=None, config=
     smtp.login(user=config['username'], password=config['password'])
     smtp.sendmail(sender or config['from'], sendto, msg.as_string())
     smtp.close()
-    yield msgid
+    yield
 
 
 validate = tf.Dict({
