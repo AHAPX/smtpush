@@ -11,3 +11,4 @@ VOLUME /smtpush
 WORKDIR /smtpush
 
 CMD python smtpush.py -c config.cfg
+
