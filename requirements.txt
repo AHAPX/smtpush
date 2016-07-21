@@ -1,0 +1,2 @@
+git+https://github.com/AHAPX/subscriber.git
+trafaret==0.7.1
