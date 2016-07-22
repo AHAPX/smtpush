@@ -23,7 +23,7 @@ class TestSMTPush(TestCase):
         with self.assertRaises(trafaret.DataError):
             validate({'to': ['t@g.com'], 'body': 'b', 'subj': 's', 'bcc': 'c@g.com'})
         with self.assertRaises(trafaret.DataError):
-            validate({'to': ['t@g.com'], 'body': 'b', 'subj': 's', 'html': 6})
+            validate({'to': ['t@g.com'], 'body': 'b', 'subj': 's', 'html': True})
 
     def test_validate_success(self):
         # short
@@ -37,7 +37,7 @@ class TestSMTPush(TestCase):
             'from': 'f@g.com',
             'cc': ['c@g.com'],
             'bcc': ['b@g.com'],
-            'html': True,
+            'html': '<h1>h</h1>',
         }
         res = {
             'to': ['t@g.com'],
@@ -46,6 +46,6 @@ class TestSMTPush(TestCase):
             'sender': 'f@g.com',
             'cc': ['c@g.com'],
             'bcc': ['b@g.com'],
-            'html': True,
+            'html': '<h1>h</h1>',
         }
         self.assertEqual(validate(data), res)

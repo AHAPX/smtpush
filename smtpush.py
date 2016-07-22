@@ -1,12 +1,13 @@
 import sys
 import traceback
-from email.mime.text import MIMEText
-from email.utils import make_msgid, formatdate
-from smtplib import SMTP
 import json
 import logging
 import argparse
 import configparser
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.utils import make_msgid, formatdate
+from smtplib import SMTP
 
 import asyncio
 import trafaret as tf
@@ -18,14 +19,21 @@ logger.setLevel(logging.WARNING)
 logger.addHandler(logging.StreamHandler())
 
 
-def sendmail(to, subj, body, html=False, sender=None, cc=None, bcc=None, config={}):
+def sendmail(to, subj, body, html=None, sender=None, cc=None, bcc=None, config={}):
     sendto = to
-    msg = MIMEText(body, 'html' if html else 'text')
+
+    msg = MIMEMultipart('alternative')
+
+    msg.attach(MIMEText(body, 'plain'))
+    if html:
+        msg.attach(MIMEText(html, 'html'))
+
     msg['To'] = ','.join(to)
     msg['From'] = sender or config.get('from', '')
     msg['Subject'] = subj
     msg['Message-ID'] = make_msgid()
     msg['Date'] = formatdate()
+
     if cc is not None:
         msg['cc'] = ','.join(cc)
         sendto += cc
@@ -50,7 +58,7 @@ validate = tf.Dict({
     tf.Key('from', optional=True) >> 'sender': tf.Email,
     tf.Key('cc', optional=True): tf.List(tf.Email),
     tf.Key('bcc', optional=True): tf.List(tf.Email),
-    tf.Key('html', optional=True): tf.Bool,
+    tf.Key('html', optional=True): tf.String,
 })
 
 
