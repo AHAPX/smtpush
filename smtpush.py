@@ -43,10 +43,10 @@ def sendmail(to, subj, body, html=None, sender=None, cc=None, bcc=None, config={
 
     smtp = SMTP(host=config['host'], port=config['port'])
     smtp.ehlo()
-    if config.get('tsl'):
+    if config.get('tls'):
         smtp.starttls()
     smtp.login(user=config['username'], password=config['password'])
-    smtp.sendmail(sender or config['from'], sendto, msg.as_string())
+    smtp.sendmail(sender or config.get('from') or config.get('username'), sendto, msg.as_string())
     smtp.close()
     yield
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--username', '-u', type=str, help='smtp username')
     parser.add_argument('--password', '-P', type=str, help='smtp password')
     parser.add_argument('--from', '-f', type=str, help='sender email')
-    parser.add_argument('--tsl', help='use tsl', action='store_true')
+    parser.add_argument('--tls', help='use tls', action='store_true')
     # redis args
     parser.add_argument('--rhost', type=str, help='redis host', default='localhost')
     parser.add_argument('--rport', type=int, help='redis port', default=6379)
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         settings['username'] = config.get('smtp', 'username', fallback=settings['username'])
         settings['password'] = config.get('smtp', 'password', fallback=settings['password'])
         settings['from'] = config.get('smtp', 'from', fallback=settings['from'])
-        settings['tsl'] = config.getboolean('smtp', 'tsl', fallback=settings['tsl'])
+        settings['tls'] = config.getboolean('smtp', 'tls', fallback=settings['tls'])
         settings['rhost'] = config.get('redis', 'host', fallback=settings['rhost'])
         settings['rport'] = config.getint('redis', 'port', fallback=settings['rport'])
         settings['rdb'] = config.getint('redis', 'db', fallback=settings['rdb'])
