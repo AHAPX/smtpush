@@ -40,7 +40,7 @@ port = 587
 username = user
 passwor = password
 from = info@host
-tsl = true
+tls = true
 
 [redis]
 host = localhost
@@ -56,7 +56,7 @@ channel = smtp-channel
 - username - smtp username
 - password - smtp password
 - from - sender email
-- tsl - using tsl
+- tls - using tls
 - rhost - host of redis broker, default=locahost
 - rport - port of redis broker, default=6379
 - rdb - number of redis db, default=0
