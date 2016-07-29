@@ -76,7 +76,7 @@ It should consist keys:
 - to - recipients (array, required)
 - subj - subject (string, required)
 - body - body (string, required)
+- html - html body text (string)
 - from - sender email (email)
 - cc - CC (array)
 - bcc - BCC (array)
-- html - body is html/text (boolean)
