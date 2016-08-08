@@ -65,8 +65,9 @@ class TestSMTPush(TestCase):
             list(redis_receiver(data, None))
             self.assertIn('send to', cm.output[0])
 
+    @patch('smtpush.SMTP_SSL')
     @patch('smtpush.SMTP')
-    def test_sendmail_1(self, mock):
+    def test_sendmail_1(self, mock, mock_ssl):
         config = {
             'host': 'localhost',
             'port': 25,
@@ -81,21 +82,27 @@ class TestSMTPush(TestCase):
         smtp.login.assert_called_once_with(user=config['username'], password=config['password'])
         smtp.sendmail.assert_called_once()
         smtp.close.assert_called_once_with()
+        mock.assert_called_once()
+        self.assertFalse(mock_ssl.called)
 
+    @patch('smtpush.SMTP_SSL')
     @patch('smtpush.SMTP')
-    def test_sendmail_2(self, mock):
+    def test_sendmail_2(self, mock, mock_ssl):
         config = {
             'host': 'localhost',
             'port': 25,
             'username': 'user',
             'password': 'pass',
             'tls': True,
+            'ssl': True,
         }
         smtp = MagicMock()
-        mock.return_value = smtp
+        mock_ssl.return_value = smtp
         list(sendmail(['a@g.com'], 'subj', 'body', 'html', 's@g.com', ['b@g.com'], config=config))
         smtp.ehlo.assert_called_once_with()
         smtp.starttls.assert_called_once_with()
         smtp.login.assert_called_once_with(user=config['username'], password=config['password'])
         smtp.sendmail.assert_called_once()
         smtp.close.assert_called_once_with()
+        self.assertFalse(mock.called)
+        mock_ssl.assert_called_once()

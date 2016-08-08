@@ -7,7 +7,7 @@ import configparser
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import make_msgid, formatdate
-from smtplib import SMTP
+from smtplib import SMTP, SMTP_SSL
 
 import asyncio
 import trafaret as tf
@@ -41,7 +41,11 @@ def sendmail(to, subj, body, html=None, sender=None, cc=None, bcc=None, config={
         msg['bcc'] = ','.join(bcc)
         sendto += bcc
 
-    smtp = SMTP(host=config['host'], port=config['port'])
+    if config.get('ssl'):
+        smtp_cls = SMTP_SSL
+    else:
+        smtp_cls = SMTP
+    smtp = smtp_cls(host=config['host'], port=config['port'])
     smtp.ehlo()
     if config.get('tls'):
         smtp.starttls()
@@ -106,6 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--password', '-P', type=str, help='smtp password')
     parser.add_argument('--from', '-f', type=str, help='sender email')
     parser.add_argument('--tls', help='use tls', action='store_true')
+    parser.add_argument('--ssl', help='use ssl', action='store_true')
     # redis args
     parser.add_argument('--rhost', type=str, help='redis host', default='localhost')
     parser.add_argument('--rport', type=int, help='redis port', default=6379)
@@ -124,6 +129,7 @@ if __name__ == '__main__':
         settings['password'] = config.get('smtp', 'password', fallback=settings['password'])
         settings['from'] = config.get('smtp', 'from', fallback=settings['from'])
         settings['tls'] = config.getboolean('smtp', 'tls', fallback=settings['tls'])
+        settings['ssl'] = config.getboolean('smtp', 'ssl', fallback=settings['ssl'])
         settings['rhost'] = config.get('redis', 'host', fallback=settings['rhost'])
         settings['rport'] = config.getint('redis', 'port', fallback=settings['rport'])
         settings['rdb'] = config.getint('redis', 'db', fallback=settings['rdb'])
